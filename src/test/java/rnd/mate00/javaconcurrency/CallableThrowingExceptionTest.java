@@ -62,4 +62,19 @@ public class CallableThrowingExceptionTest {
         System.out.println(stringFutureTask.get());
     }
 
+    @Test
+    public void waitUntilDone() throws InterruptedException, ExecutionException {
+        Future<String> future = Executors.newSingleThreadExecutor().submit(() -> {
+            Thread.sleep(2000);
+            return "result from callable";
+        });
+
+        while (!future.isDone()) {
+            System.out.println("waiting for completion");
+            Thread.sleep(200);
+        }
+
+        System.out.println(future.get());
+    }
+
 }
