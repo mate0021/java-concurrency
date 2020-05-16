@@ -2,10 +2,7 @@ package rnd.mate00.javaconcurrency;
 
 import org.junit.Test;
 
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 import static org.junit.Assert.*;
 
@@ -46,6 +43,23 @@ public class CallableThrowingExceptionTest {
             Throwable cause = e.getCause();
             System.out.println(cause.getMessage());
         }
+    }
+
+    @Test
+    public void futureTask() throws InterruptedException, ExecutionException {
+        FutureTask<String> stringFutureTask = new FutureTask<>(() -> {
+            int i = 0;
+            while (i < 1000) {
+                System.out.println("calculating...");
+                Thread.sleep(100);
+                i += 100;
+            }
+            return "result from future task";
+        });
+
+        Executors.newSingleThreadExecutor().submit(stringFutureTask);
+
+        System.out.println(stringFutureTask.get());
     }
 
 }
