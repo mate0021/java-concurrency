@@ -77,4 +77,37 @@ public class CallableThrowingExceptionTest {
         System.out.println(future.get());
     }
 
+    @Test(expected = TimeoutException.class)
+    public void timeout() throws InterruptedException, ExecutionException, TimeoutException {
+        Future<String> future = Executors.newSingleThreadExecutor().submit(() -> {
+            Thread.sleep(2000);
+            return "long waited result";
+        });
+
+        String result = future.get(200, TimeUnit.MILLISECONDS);
+    }
+
+    @Test
+    public void cancellingTask() {
+        Future<String> future = Executors.newSingleThreadExecutor().submit(() -> {
+            Thread.sleep(2000);
+            return "Let's cancel this";
+        });
+
+        future.cancel(true);
+
+        assertTrue(future.isCancelled());
+    }
+
+    @Test(expected = CancellationException.class)
+    public void getFromCancelledTask() throws ExecutionException, InterruptedException {
+        Future<String> future = Executors.newSingleThreadExecutor().submit(() -> {
+            Thread.sleep(2000);
+            return "Let's cancel it";
+        });
+
+        future.cancel(true);
+
+        future.get();
+    }
 }
