@@ -17,6 +17,8 @@ public class ForkJoinTest {
 
         ForkJoinTask<Integer> submittedTask = pool.submit(task);
         System.out.println(submittedTask.get());
+
+        pool.shutdown();
     }
 }
 

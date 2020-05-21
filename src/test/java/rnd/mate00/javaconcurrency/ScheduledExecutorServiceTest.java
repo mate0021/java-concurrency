@@ -24,6 +24,8 @@ public class ScheduledExecutorServiceTest {
         ScheduledFuture<String> future = scheduledExecutor.schedule(simpleTask, 3, TimeUnit.SECONDS);
 
         System.out.println(future.get());
+
+        scheduledExecutor.shutdown();
     }
 
     @Test
@@ -38,6 +40,8 @@ public class ScheduledExecutorServiceTest {
         } catch (TimeoutException e) {
             // that's ok...
         }
+
+        scheduledExecutor.shutdown();
     }
 
     @Test
@@ -52,5 +56,7 @@ public class ScheduledExecutorServiceTest {
         } catch (TimeoutException e) {
             // that's ok...
         }
+
+        scheduledExecutor.shutdown();
     }
 }
