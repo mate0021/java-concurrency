@@ -29,4 +29,18 @@ public class CompletableFutureTest {
         CompletableFuture<String> completed = CompletableFuture.completedFuture("we know the result already");
         System.out.println(completed.get());
     }
+
+    @Test
+    public void useRunAsyncForJustRunInSeparateThread() {
+        CompletableFuture.runAsync(() -> {
+            System.out.println(Thread.currentThread().getName());
+        });
+    }
+
+    @Test
+    public void useSupplierToProvideResult() throws ExecutionException, InterruptedException {
+        CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> Thread.currentThread().getName());
+
+        System.out.println(future.get());
+    }
 }
