@@ -43,4 +43,40 @@ public class CompletableFutureTest {
 
         System.out.println(future.get());
     }
+
+    @Test
+    public void hereWeWaitForFutureComputation_AndDoPostProcessing() throws ExecutionException, InterruptedException {
+        CompletableFuture<String> future = CompletableFuture
+                .supplyAsync(() -> {
+                    try {
+                        Thread.sleep(2000);
+                        return Thread.currentThread().getName();
+                    } catch (InterruptedException e) {
+                        return "";
+                    }
+                })
+                .thenApply(String::toUpperCase); // <-- we're returning Future<String>, with some post processing result
+
+        System.out.println(future.get());
+    }
+
+    @Test
+    public void waitForFutureComputation_AndAcceptIt() throws ExecutionException, InterruptedException {
+        CompletableFuture<Void> future = CompletableFuture
+                .supplyAsync(() -> Thread.currentThread().getName())
+                .thenAccept(s -> System.out.println("our computation returned: " + s)); // <-- here we're just taking result of
+                                                                                        // computations but don't return anything
+
+        System.out.println(future.get()); // <-- null here
+    }
+
+    @Test
+    public void waitForFutureComputation_AndThenRunSomethingElse() throws ExecutionException, InterruptedException {
+        CompletableFuture<Void> future = CompletableFuture
+                .supplyAsync(() -> Thread.currentThread().getName())
+                .thenAccept(s -> System.out.println("First was run on: " + s))
+                .thenRun(() -> System.out.println("Last is run on " + Thread.currentThread().getName()));
+
+        System.out.println(future.get());
+    }
 }
