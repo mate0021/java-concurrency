@@ -5,6 +5,7 @@ import org.junit.Test;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.function.Supplier;
 
 public class CompletableFutureTest {
 
@@ -76,6 +77,53 @@ public class CompletableFutureTest {
                 .supplyAsync(() -> Thread.currentThread().getName())
                 .thenAccept(s -> System.out.println("First was run on: " + s))
                 .thenRun(() -> System.out.println("Last is run on " + Thread.currentThread().getName()));
+
+        System.out.println(future.get());
+    }
+
+    @Test
+    public void composingTwoCompletables() throws ExecutionException, InterruptedException {
+        CompletableFuture<String> future = new CompletableFuture<>();
+        Executors.newSingleThreadExecutor().submit(() -> {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            future.complete("1st stage");
+        });
+
+        CompletableFuture<String> finalFuture = future.thenCompose(str -> CompletableFuture.supplyAsync(() -> {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            return str + " 2nd stage";
+        }));
+
+        System.out.println(future.get());
+        System.out.println(finalFuture.get());
+    }
+
+    @Test
+    public void shorterVersionOfAbove() throws ExecutionException, InterruptedException {
+        CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return "1st stage";
+        }).thenCompose(resultFromPreviousSupplier -> CompletableFuture.supplyAsync(() -> {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return resultFromPreviousSupplier + " 2nd stage";
+        }));
 
         System.out.println(future.get());
     }
