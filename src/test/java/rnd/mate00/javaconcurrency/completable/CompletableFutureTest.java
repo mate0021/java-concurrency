@@ -5,7 +5,6 @@ import org.junit.Test;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
-import java.util.function.Supplier;
 
 public class CompletableFutureTest {
 
@@ -126,5 +125,14 @@ public class CompletableFutureTest {
         }));
 
         System.out.println(future.get());
+    }
+
+    @Test
+    public void thenAcceptBoth() {
+        CompletableFuture.supplyAsync(() -> "X1")
+                .thenAcceptBoth(
+                        CompletableFuture.supplyAsync(() -> "X2"),
+                        (result1, result2) -> System.out.println(String.format("Result from both: %s %s", result1, result2)
+                ));
     }
 }
