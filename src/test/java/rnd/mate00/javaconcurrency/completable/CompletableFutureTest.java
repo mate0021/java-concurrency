@@ -2,9 +2,12 @@ package rnd.mate00.javaconcurrency.completable;
 
 import org.junit.Test;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CompletableFutureTest {
 
@@ -134,5 +137,29 @@ public class CompletableFutureTest {
                         CompletableFuture.supplyAsync(() -> "X2"),
                         (result1, result2) -> System.out.println(String.format("Result from both: %s %s", result1, result2)
                 ));
+    }
+
+    @Test
+    public void waitForAll_ProvideNoResult() throws ExecutionException, InterruptedException {
+        CompletableFuture<String> future1 = CompletableFuture.supplyAsync(() -> "1st call");
+        CompletableFuture<String> future2 = CompletableFuture.supplyAsync(() -> "2nd call");
+        CompletableFuture<String> future3 = CompletableFuture.supplyAsync(() -> "3rd call");
+
+        CompletableFuture<Void> all = CompletableFuture.allOf(future1, future2, future3);
+
+        System.out.println(all.get()); // <-- <Void> type, so no result is provided
+    }
+
+    @Test
+    public void joinAll_GetResult() throws ExecutionException, InterruptedException {
+        CompletableFuture<String> future1 = CompletableFuture.supplyAsync(() -> "1st call");
+        CompletableFuture<String> future2 = CompletableFuture.supplyAsync(() -> "2nd call");
+        CompletableFuture<String> future3 = CompletableFuture.supplyAsync(() -> "3rd call");
+
+        List<String> totalResult = Stream.of(future1, future2, future3)
+                .map(CompletableFuture::join)
+                .collect(Collectors.toList());
+
+        System.out.println(totalResult);
     }
 }
