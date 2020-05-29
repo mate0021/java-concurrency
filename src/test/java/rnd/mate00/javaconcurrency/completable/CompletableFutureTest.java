@@ -1,7 +1,6 @@
 package rnd.mate00.javaconcurrency.completable;
 
 import org.junit.Test;
-import rnd.mate00.javaconcurrency.SupplierThrowingException;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -9,8 +8,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static org.junit.Assert.assertEquals;
 
 public class CompletableFutureTest {
 
@@ -164,29 +161,5 @@ public class CompletableFutureTest {
                 .collect(Collectors.toList());
 
         System.out.println(totalResult);
-    }
-
-    @Test(expected = ExecutionException.class)
-    public void notHandlingExceptions() throws ExecutionException, InterruptedException {
-        SupplierThrowingException supplier = new SupplierThrowingException(9);
-
-        CompletableFuture.supplyAsync(supplier).get();
-    }
-
-    @Test
-    public void handlingExceptions() throws ExecutionException, InterruptedException {
-        SupplierThrowingException supplier = new SupplierThrowingException(9);
-
-        String result = CompletableFuture.supplyAsync(supplier)
-                .handle((input, throwable) -> {
-                    if (input != null) {
-                        return input;
-                    } else {
-                        return "default";
-                    }
-                })
-                .get();
-
-        assertEquals("default", result);
     }
 }
