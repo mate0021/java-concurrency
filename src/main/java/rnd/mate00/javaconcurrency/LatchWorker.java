@@ -14,6 +14,7 @@ public class LatchWorker implements Callable<String> {
     @Override
     public String call() throws Exception {
         String result = Thread.currentThread().getName();
+        Thread.sleep(500);
         latch.countDown();
 
         return result;
