@@ -4,8 +4,6 @@ import org.junit.Test;
 import rnd.mate00.javaconcurrency.BarrierWorker;
 
 import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class CyclicBarrierTest {
 
@@ -19,9 +17,8 @@ public class CyclicBarrierTest {
         BarrierWorker w2 = new BarrierWorker(barrier);
         BarrierWorker w3 = new BarrierWorker(barrier);
 
-        ExecutorService executorService = Executors.newCachedThreadPool();
-        executorService.submit(w1).get();
-        executorService.submit(w2).get();
-        executorService.submit(w3).get();
+        new Thread(w1).start();
+        new Thread(w2).start();
+        new Thread(w3).start();
     }
 }
