@@ -12,18 +12,22 @@ import java.util.stream.IntStream;
 
 public class SemaphoreTest {
 
-    @Test
-    public void nonBlockingAcquire() {
-        Semaphore semaphore = new Semaphore(3);
-        SemaphoreJob job = new SemaphoreJob(semaphore);
+    @Test // <-- here if a thread can't enter into critical section it just passes and doesn't wait
+    public void nonBlockingAcquire() throws InterruptedException {
+        Semaphore semaphore = new Semaphore(1);
+        ExecutorService executorService = Executors.newFixedThreadPool(3);
+
         IntStream
-                .range(0, 5)
+                .range(0, 3)
                 .forEach(i -> {
-                    new Thread(job).start();
+                    executorService.submit(new SemaphoreJob(semaphore, String.valueOf(i)));
                 });
+
+        executorService.shutdown();
+        executorService.awaitTermination(10, TimeUnit.SECONDS);
     }
 
-    @Test
+    @Test // <-- here thread will be blocked waiting for a Semaphore to open
     public void blockingAcquire() throws InterruptedException {
         Semaphore semaphore = new Semaphore(1);
         ExecutorService executorService = Executors.newFixedThreadPool(3);

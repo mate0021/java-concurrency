@@ -6,8 +6,11 @@ public class SemaphoreJob implements Runnable {
 
     private Semaphore semaphore;
 
-    public SemaphoreJob(Semaphore semaphore) {
+    private String name;
+
+    public SemaphoreJob(Semaphore semaphore, String name) {
         this.semaphore = semaphore;
+        this.name = name;
     }
 
     @Override
@@ -16,17 +19,19 @@ public class SemaphoreJob implements Runnable {
     }
 
     private void criticalOperation() {
-        System.out.println("performing some calculations");
-        if (semaphore.tryAcquire()) {
+        System.out.println(name + " A");
+        if (semaphore.tryAcquire()) { // <-- don't block if Semaphore is closed
             try {
-                System.out.println(String.format("critical section done by %s / available slots %d", Thread.currentThread(), semaphore.availablePermits()));
-                Thread.sleep(1500);
+                System.out.println(name + " B");
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } finally {
-                System.out.println(String.format("%s releasing semaphore", Thread.currentThread()));
+                System.out.println(name + " C");
                 semaphore.release();
             }
+        } else {
+            System.out.println(name + " couldn't enter");
         }
     }
 }
