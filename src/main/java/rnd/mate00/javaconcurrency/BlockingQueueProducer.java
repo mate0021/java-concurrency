@@ -17,8 +17,10 @@ public class BlockingQueueProducer implements Runnable {
     @Override
     public void run() {
         try {
-            for (int i = 0; i < 100; i++) {
-                queue.put(UUID.randomUUID().toString());
+            for (int i = 0; i < 10; i++) {
+                String value = UUID.randomUUID().toString();
+                System.out.println(String.format("%s putting %s) value %s", Thread.currentThread().getName(), i, value));
+                queue.put(value);
                 Thread.sleep(200);
             }
             queue.put(poisonMessage);

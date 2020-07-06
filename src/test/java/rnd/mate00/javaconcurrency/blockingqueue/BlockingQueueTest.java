@@ -4,8 +4,7 @@ import org.junit.Test;
 import rnd.mate00.javaconcurrency.BlockingQueueConsumer;
 import rnd.mate00.javaconcurrency.BlockingQueueProducer;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.*;
 import java.util.stream.IntStream;
 
 public class BlockingQueueTest {
@@ -15,9 +14,12 @@ public class BlockingQueueTest {
         BlockingQueue<String> queue = new LinkedBlockingQueue<>(10);
         String poisonMessage = "STOP";
 
-        IntStream.range(0, 20).forEach(i -> { new Thread(new BlockingQueueConsumer(queue, poisonMessage)).start(); });
-        IntStream.range(0, 5).forEach(i -> { new Thread(new BlockingQueueProducer(queue, poisonMessage)).start(); });
+        ExecutorService executor = Executors.newCachedThreadPool();
 
-        Thread.sleep(2000);
+        IntStream.range(0, 1).forEach(i -> { executor.submit(new Thread(new BlockingQueueConsumer(queue, poisonMessage))); });
+        IntStream.range(0, 2).forEach(i -> { executor.submit(new Thread(new BlockingQueueProducer(queue, poisonMessage))); });
+
+        executor.shutdown();
+        executor.awaitTermination(10, TimeUnit.SECONDS);
     }
 }
