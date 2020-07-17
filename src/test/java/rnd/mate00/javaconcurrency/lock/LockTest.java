@@ -40,7 +40,26 @@ public class LockTest {
 
         executorService.shutdown();
         executorService.awaitTermination(5, TimeUnit.SECONDS);
+    }
 
+    @Test
+    public void synchronizedWithTryLock() throws InterruptedException {
+        int waitTimeout = 50; // <-- play with this value. If it's nThreads * thread_sleep then output is ok
+        SharedObjectWithTryLock shared = new SharedObjectWithTryLock(waitTimeout);
+
+        ExecutorService executorService = Executors.newFixedThreadPool(5);
+        for (int i = 0; i < 10; i++) {
+            executorService.execute(() -> {
+                try {
+                    System.out.println(Thread.currentThread() + " " + shared.incrementAndGet());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } );
+        }
+
+        executorService.shutdown();
+        executorService.awaitTermination(5, TimeUnit.SECONDS);
     }
 }
 
@@ -49,13 +68,38 @@ class SharedObject {
     private Lock lock = new ReentrantLock();
 
     int incrementAndGet() throws InterruptedException {
-        lock.lock();
+//        lock.lock();
         try {
             Thread.sleep(10);
             counter++;
         } finally {
-            lock.unlock();
+//            lock.unlock();
         }
+        return counter;
+    }
+}
+
+class SharedObjectWithTryLock {
+    private int counter;
+    private Lock lock = new ReentrantLock();
+    private int waitTimeout;
+
+    public SharedObjectWithTryLock(int waitTimeout) {
+        this.waitTimeout = waitTimeout;
+    }
+
+    int incrementAndGet() throws InterruptedException {
+        boolean locked = lock.tryLock(waitTimeout, TimeUnit.MILLISECONDS);
+
+        if (locked) {
+            try {
+                Thread.sleep(10);
+                counter++;
+            } finally {
+                lock.unlock();
+            }
+        }
+
         return counter;
     }
 }
