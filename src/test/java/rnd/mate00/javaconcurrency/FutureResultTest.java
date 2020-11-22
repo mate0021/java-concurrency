@@ -71,6 +71,6 @@ public class FutureResultTest {
 
         future.cancel(true);
 
-        future.get();
+        System.out.println(future.get()); // <-- nothing's here
     }
 }
