@@ -37,11 +37,9 @@ public class CallableThrowingExceptionTest {
 
         try {
             future.get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         } catch (ExecutionException e) {
             Throwable cause = e.getCause();
-            System.out.println(cause.getMessage());
+            System.out.println(cause); // <-- cause was RuntimeException
         }
     }
 }
